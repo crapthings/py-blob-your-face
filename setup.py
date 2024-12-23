@@ -7,7 +7,7 @@ with open('README.md', encoding='utf-8') as f:
 
 setup(
     name="blob-your-face",
-    version="0.1.0",
+    version="0.1.1",
     author="crapthings",
     author_email="crapthings@gmail.com",
     description="A tool to detect faces in images and apply a blob effect",
