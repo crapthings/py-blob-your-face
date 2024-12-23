@@ -5,7 +5,7 @@ A command-line tool to detect faces in images and apply a blob effect to them.
 ## Installation
 
 ```
-pip install .
+pip install blob-your-face
 ```
 
 ## Usage
@@ -45,6 +45,7 @@ blob_your_face ./inputs --color 255,0,0 --shape ellipse --pad 10
 - OpenCV
 - NumPy
 - Ultralytics YOLO
+- Pillow
 
 ## Note
 
