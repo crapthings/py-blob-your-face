@@ -7,7 +7,7 @@ with open('README.md', encoding='utf-8') as f:
 
 setup(
     name="blob-your-face",
-    version="0.1.1",
+    version="0.1.2",
     author="crapthings",
     author_email="crapthings@gmail.com",
     description="A tool to detect faces in images and apply a blob effect",
@@ -23,6 +23,7 @@ setup(
         "opencv-python",
         "numpy",
         "ultralytics",
+        "pillow",
     ],
     entry_points={
         "console_scripts": [

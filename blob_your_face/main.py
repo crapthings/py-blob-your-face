@@ -5,7 +5,7 @@ import os
 import argparse
 import random
 import string
-import pkg_resources
+from blob_your_face import MODEL_PATH
 
 def create_mask(shape, center, size, mask_type='circle'):
     mask = np.zeros(shape[:2], dtype=np.uint8)
@@ -58,8 +58,7 @@ def read_image(image_path):
 
 def detect_and_blob_faces(image_path, output_path, color, shape, pad):
     # Load YOLO model
-    model_path = pkg_resources.resource_filename("blob_your_face", "yolov8n-face.pt")
-    model = YOLO(model_path)
+    model = YOLO(MODEL_PATH)
 
     # Read the image
     image = read_image(image_path)

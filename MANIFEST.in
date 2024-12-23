@@ -1,1 +1,1 @@
-include blob_your_face/*.pt
+include blob_your_face/yolov8n-face.pt
