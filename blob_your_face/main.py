@@ -5,6 +5,7 @@ import os
 import argparse
 import random
 import string
+import pkg_resources
 
 def create_mask(shape, center, size, mask_type='circle'):
     mask = np.zeros(shape[:2], dtype=np.uint8)
@@ -34,12 +35,34 @@ def apply_blob_effect(image, face, color, shape, pad):
     
     return result
 
+def read_image(image_path):
+    # 尝试用 OpenCV 读取图像
+    image = cv2.imread(image_path)
+    if image is not None:
+        return image
+
+    # 如果 OpenCV 失败，尝试用 Pillow 读取
+    try:
+        with Image.open(image_path) as img:
+            # 转换为 RGB 模式（如果是 RGBA，去掉 alpha 通道）
+            if img.mode == 'RGBA':
+                img = img.convert('RGB')
+            # 将 Pillow 图像转换为 NumPy 数组
+            image = np.array(img)
+            # 将 RGB 转换为 BGR（OpenCV 格式）
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            return image
+    except Exception as e:
+        print(f"Error reading image {image_path}: {e}")
+        return None
+
 def detect_and_blob_faces(image_path, output_path, color, shape, pad):
     # Load YOLO model
-    model = YOLO('yolov8n-face.pt')
+    model_path = pkg_resources.resource_filename("blob_your_face", "yolov8n-face.pt")
+    model = YOLO(model_path)
 
     # Read the image
-    image = cv2.imread(image_path)
+    image = read_image(image_path)
     
     if image is None:
         print(f"Error: Unable to read image {image_path}")
@@ -56,23 +79,24 @@ def detect_and_blob_faces(image_path, output_path, color, shape, pad):
             face = (x1, y1, x2 - x1, y2 - y1)
             image = apply_blob_effect(image, face, color, shape, pad)
     
-    # Save the result
+    # Save the result as PNG
     cv2.imwrite(output_path, image)
     print(f"Processed image saved to {output_path}")
 
 def process_directory(input_dir, output_dir, color, shape, pad):
-    supported_formats = ['.jpg', '.jpeg', '.png', '.bmp']
+    supported_formats = ['.jpg', '.jpeg', '.png', '.bmp', '.webp', '.avif']
     
     for filename in os.listdir(input_dir):
         if any(filename.lower().endswith(ext) for ext in supported_formats):
             input_path = os.path.join(input_dir, filename)
-            output_path = os.path.join(output_dir, filename)
+            output_filename = os.path.splitext(filename)[0] + '.png'  # Change extension to .png
+            output_path = os.path.join(output_dir, output_filename)
             detect_and_blob_faces(input_path, output_path, color, shape, pad)
 
 def main():
     parser = argparse.ArgumentParser(description="Apply blob effect to faces in images.")
     parser.add_argument("input_dir", help="Input directory containing images")
-    parser.add_argument("--color", default="255,255,255", help="Blob color in BGR format (e.g., '255,0,0' for blue)")
+    parser.add_argument("--color", default="0,0,0", help="Blob color in BGR format (e.g., '255,0,0' for blue)")
     parser.add_argument("--shape", choices=['circle', 'ellipse', 'rectangle', 'square'], default='circle', help="Shape of the blob")
     parser.add_argument("--pad", type=int, default=0, help="Padding size for the blob")
     args = parser.parse_args()
